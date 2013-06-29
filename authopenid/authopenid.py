@@ -117,6 +117,9 @@ class AuthOpenIdPlugin(Component):
             on each authenticated access.
             """)
 
+    default_openid = Option('openid', 'take_default_login', False,
+            """Set to true if /login should be handled by openid.""")
+
     default_openid = Option('openid', 'default_openid', None,
             """Default OpenID provider for directed identity.""")
 
@@ -317,10 +320,12 @@ class AuthOpenIdPlugin(Component):
     # IRequestHandler methods
 
     def match_request(self, req):
-        return re.match('/(openidlogin|openidverify|openidprocess|openidlogout)\??.*', req.path_info)
+        return (re.match('/(openidlogin|openidverify|openidprocess|openidlogout)\??.*', req.path_info) or 
+            (self.take_default_login and (req.path_info == '/login' or req.path_info == '/login/')))
+            # Please note that I am not using re.match on purpose, because /login/xmlrpc cannot be handled with openid
 
     def process_request(self, req):
-        if req.path_info.startswith('/openidlogin'):
+        if req.path_info.startswith('/openidlogin') or (self.take_default_login and req.path_info.startswith('/login')):
             return self._do_login(req)
         elif req.path_info.startswith('/openidverify'):
             return self._do_verify(req)
