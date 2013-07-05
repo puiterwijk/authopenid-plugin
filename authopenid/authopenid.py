@@ -117,7 +117,7 @@ class AuthOpenIdPlugin(Component):
             on each authenticated access.
             """)
 
-    default_openid = Option('openid', 'take_default_login', False,
+    take_default_login = Option('openid', 'take_default_login', False,
             """Set to true if /login should be handled by openid.""")
 
     default_openid = Option('openid', 'default_openid', None,
